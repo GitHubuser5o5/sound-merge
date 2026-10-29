@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build output
+build/
+dist/
+
+# Runtime state / personal data (never commit)
+.dj_downlist.lock
+gui_settings.json
+queue.txt
+done_log.txt
+temp_downloads/
+input_downloads/
+output_mp3/
+*cookies*.txt
+wallpaper.jpg
+*.mp3
+
+# Editor / tooling
+.vscode/
+.idea/

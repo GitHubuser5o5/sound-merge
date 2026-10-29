@@ -1,0 +1,6 @@
+yt-dlp
+mutagen
+tkinterdnd2
+send2trash
+Pillow
+customtkinter

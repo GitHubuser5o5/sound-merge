@@ -1,0 +1,8 @@
+{
+  "queue_file": "queue.txt",
+  "done_log": "done_log.txt",
+  "temp_dir": "temp_downloads",
+  "input_folder": "input_downloads",
+  "mp3_folder": "output_mp3",
+  "poll_seconds": 5
+}
