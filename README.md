@@ -1,49 +1,29 @@
-<div align="center">
+<p align="center">
+  <img src="sound%20merge%20logo.png" alt="Sound Merge" width="360">
+</p>
 
-<img src="sound%20merge%20logo.png" alt="Sound Merge" width="420">
+# Sound Merge
 
-### SoundCloud track → properly tagged, honestly labelled MP3 → straight into your Rekordbox import folder
+Sound Merge is a Windows desktop app that turns SoundCloud tracks into tagged MP3 files and puts them in your Rekordbox import folder. It either merges a file you already have with its SoundCloud link, or downloads a track from a URL. Playlists, analysis and cue points are still done in Rekordbox.
 
-![Platform](https://img.shields.io/badge/platform-Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
-![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![UI](https://img.shields.io/badge/UI-customtkinter-red?style=for-the-badge)
-![Powered by](https://img.shields.io/badge/powered%20by-yt--dlp%20%2B%20ffmpeg-black?style=for-the-badge)
+## Contents
 
-</div>
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Building the exe](#building-the-exe)
+- [Queue watcher](#queue-watcher)
+- [Tests](#tests)
+- [Project layout](#project-layout)
+- [Disclaimer](#disclaimer)
 
----
+## Installation
 
-**Sound Merge** is a small desktop app that takes care of the boring part of building a DJ library: download or convert, tag, name, and file. You still make playlists, run analysis and set cue points yourself in Rekordbox. Sound Merge only gets clean MP3s into the right folder.
+Requirements:
 
-## ✨ Features
-
-- 🎯 **Two flows, one window** – merge a file you already have with its SoundCloud link, or download a rip straight from a URL.
-- 🏷️ **Real tags** – title, artist, genre, year and cover art are written as ID3 tags from the track's metadata.
-- 🧹 **Clean titles** – promo text like `(Free Download)`, `[FREE DL]` or `Free-Download!` is stripped automatically.
-- 📏 **Honest quality** – a file is never upscaled. MP3s are copied untouched, other formats become true 320 kbps CBR MP3, and lossy streams keep their real bitrate.
-- 🗑️ **Safe clean-up** – optionally send the source file to the Recycle Bin (recoverable) after a successful merge.
-- 🖱️ **Drag & drop** – drop an audio file onto the window or click to browse.
-- 🔒 **Single instance guard** – opening a second copy asks whether to run alongside, skip, or close the other one.
-- 📝 **Clean log + detailed log** – a short status per job, with the full yt-dlp / ffmpeg output one click away.
-
-## 🔄 How it works
-
-```mermaid
-flowchart LR
-    A[Audio file you already have<br/>+ SoundCloud URL] -->|metadata only| M[Fetch metadata<br/>title · artist · genre · year · cover]
-    B[SoundCloud URL] -->|yt-dlp| D[Download best audio]
-    M --> C{Already MP3?}
-    D --> C
-    C -->|yes| K[Copy as-is]
-    C -->|no| V[ffmpeg → MP3<br/>320 kbps CBR or source bitrate]
-    K --> T[Write ID3 tags + cover art]
-    V --> T
-    T --> O[(Your MP3 folder<br/>ready for Rekordbox)]
-```
-
-## 🚀 Quick start
-
-**Requirements:** Windows, Python 3.10+, and [ffmpeg](https://ffmpeg.org/download.html) on your `PATH` (`ffmpeg -version` should work in a terminal).
+- Windows
+- Python 3.10 or newer
+- [ffmpeg](https://ffmpeg.org/download.html) on your `PATH` (`ffmpeg -version` should work in a terminal)
 
 ```bash
 git clone https://github.com/GitHubuser5o5/sound-merge.git
@@ -51,97 +31,96 @@ cd sound-merge
 pip install -r requirements.txt
 ```
 
-Open `config.json` and set `mp3_folder` to the folder you import from in Rekordbox (see [Configuration](#%EF%B8%8F-configuration)), then start the app:
+Set `mp3_folder` in `config.json` to the folder Rekordbox imports from (see [Configuration](#configuration)), then start the app:
 
 ```bash
 python gui.py
 ```
 
-## 🎛️ Using the app
+## Usage
 
-### Flow 1 – Process file + link
+The window has two flows.
 
-Use this for a track you already downloaded yourself (for example from a site that needs a sign-in).
+### Process file + link
 
-1. Drag the audio file onto the drop zone, or click the zone to browse (it opens in your Downloads folder).
-2. Paste the track's SoundCloud URL underneath.
+For a track you already downloaded yourself, for example from a site that needs a sign-in.
+
+1. Drag the audio file onto the drop zone, or click the zone to browse. It opens in your Downloads folder.
+2. Paste the track's SoundCloud URL below it.
 3. Click **Process file + link**.
 
-What happens:
+Title, artist, genre, year and cover art are fetched from the URL. No audio is downloaded from SoundCloud in this flow. An MP3 is copied as is. Any other format is converted to 320 kbps CBR MP3. The audio quality is whatever your file already has; nothing is upscaled.
 
-- Metadata (title, artist, genre, year, cover art) is fetched from the URL. **No audio is downloaded from SoundCloud in this flow.**
-- If your file is already an MP3 it's copied as-is. Anything else is converted to a true 320 kbps CBR MP3. Your file's real quality is kept, never faked.
-- The **Delete original after merge** switch sends the source file to the Recycle Bin after a successful merge. It's off by default and your choice is remembered.
-- The fields only clear after a *successful* merge, so a failed attempt can simply be retried.
+The **Delete original after merge** switch sends the source file to the Recycle Bin after a successful merge. It is off by default and the setting is remembered. The input fields are only cleared after a successful merge, so a failed attempt can be retried as is.
 
-### Flow 2 – Download 160 kbps rip
+### Download 160kbps rip
 
 1. Paste a SoundCloud URL.
 2. Click **Download 160kbps rip**.
 
-Sound Merge downloads, converts and tags the track on its own. Without a logged-in session SoundCloud usually only exposes a streamed preview (about 128–160 kbps) rather than the uploader's original, so the output keeps that real bitrate and is **never upscaled**. If a free-download original happens to be reachable, you get a true 320 kbps encode instead.
+The track is downloaded, converted and tagged. Without a signed-in SoundCloud session, most tracks are only available as a stream of about 128-160 kbps, so the output keeps that bitrate instead of being upscaled to 320 kbps. If a free-download original is available, it is encoded as 320 kbps CBR.
 
-### Good to know
+### Other behaviour
 
-- One job runs at a time; the buttons are disabled while a job is running.
-- Window size and position are remembered between runs.
-- If `wallpaper.jpg` sits next to the app it's used as the background, and the window is locked to the image's aspect ratio so it never stretches. Without it you get a plain dark window.
+- Promo text such as `(Free Download)`, `[FREE DL]` or `Free-Download!` is removed from titles.
+- One job runs at a time. The buttons are disabled while a job is running.
+- The main log shows a short status per job. **Show detailed log** shows the full yt-dlp and ffmpeg output.
+- Opening a second copy asks whether to run alongside the first, skip, or close the other one.
+- Window size and position are remembered.
+- If `wallpaper.jpg` is next to the app, it is used as the background and the window keeps the image's aspect ratio. Without it the window is plain dark. The image is not included in this repository; use any image you like.
 
-## ⚙️ Configuration
+## Configuration
 
-`config.json` lives next to `gui.py` (or the built exe). Relative paths are resolved from the app's own folder.
+`config.json` is read from the folder of `gui.py` or the exe. Relative paths are resolved from that folder.
 
-| Key | Default | What it does |
+| Key | Default | Description |
 | --- | --- | --- |
-| `mp3_folder` | `output_mp3` | Where finished MP3s are saved. Point it at your Rekordbox import / watch folder, e.g. `D:/Music/Unsorted`. |
-| `queue_file` | `queue.txt` | URL list used by the headless watcher. |
+| `mp3_folder` | `output_mp3` | Where finished MP3 files are saved. Set this to your Rekordbox import folder, for example `D:/Music/Unsorted`. |
+| `queue_file` | `queue.txt` | URL list used by the queue watcher. |
 | `done_log` | `done_log.txt` | URLs the watcher has already processed. |
 | `temp_dir` | `temp_downloads` | Scratch space for downloads and cover art. |
-| `input_folder` | `input_downloads` | Working folder for local-file merges. |
-| `poll_seconds` | `5` | How often the watcher checks `queue.txt`. |
+| `input_folder` | `input_downloads` | Working folder for local file merges. |
+| `poll_seconds` | `5` | How often the watcher checks `queue_file`. |
 
-**Optional cookies:** if a site needs a signed-in session, export your cookies in Netscape format and save them as `www.beatport.com_cookies.txt` next to the app. The file is passed to yt-dlp and is listed in `.gitignore` so it never ends up in a commit.
+If a site needs a signed-in session, export your cookies in Netscape format and save them as `www.beatport.com_cookies.txt` next to the app. The file is passed to yt-dlp. It is listed in `.gitignore`; do not commit it.
 
-## 📦 Building the exe
+## Building the exe
 
 ```bash
 pip install pyinstaller
 pyinstaller --onefile --windowed --collect-data tkinterdnd2 --collect-data customtkinter --icon "sound merge icon.ico" --name "Sound Merge" gui.py
 ```
 
-Copy `config.json`, `sound merge logo.png`, `sound merge icon.png` (and optionally `wallpaper.jpg`) next to the finished exe in `dist/`. The app looks for its config, images and working folders next to the exe itself, not in the current working directory.
+Copy `config.json`, `sound merge logo.png` and `sound merge icon.png` (and `wallpaper.jpg`, if you use one) next to the exe in `dist/`. The app looks for its config, images and working folders next to the exe, not in the current directory.
 
-## 🧪 Tests
+## Queue watcher
 
-```bash
-python test_core.py
-```
-
-A quick smoke test of the shared helpers: filename sanitising, MP3 pass-through vs. conversion, tagging, duplicate naming, the single-instance lock and settings persistence. Run it before rebuilding the exe.
-
-## 🖥️ Advanced: headless queue watcher
-
-`watcher.py` is a terminal alternative to the **Download 160kbps rip** button. Start it, then paste SoundCloud URLs (one per line) into `queue.txt` and save. Each new URL is downloaded, converted, tagged and filed automatically.
+`watcher.py` does the same job as **Download 160kbps rip** from the terminal. Start it, then add SoundCloud URLs to `queue.txt`, one per line, and save the file. Each new URL is downloaded, converted, tagged and moved to `mp3_folder`.
 
 ```bash
 python watcher.py
 ```
 
-## 🗂️ Project layout
+## Tests
 
-```
-sound-merge/
-├── gui.py              # customtkinter app (entry point)
-├── core.py             # shared helpers: config, ffmpeg, tagging, locking
-├── watch_input.py      # "Process file + link" pipeline
-├── watcher.py          # URL → MP3 pipeline / headless queue watcher
-├── test_core.py        # smoke tests for core.py
-├── config.json         # folder settings
-├── requirements.txt
-├── Sound Merge.spec    # PyInstaller spec
-└── sound merge *.png / *.ico   # logo and icons
+```bash
+python test_core.py
 ```
 
-## ⚖️ Disclaimer
+A smoke test of the shared helpers: filename sanitising, MP3 pass-through versus conversion, tagging, duplicate file naming, the single-instance lock and settings storage. Run it before building the exe.
 
-Sound Merge is a personal tool and is not affiliated with SoundCloud, Beatport, Pioneer DJ / AlphaTheta or Rekordbox. Only download and convert music you have the right to use, and follow the terms of the services you use it with.
+## Project layout
+
+```
+gui.py           customtkinter app (entry point)
+core.py          config, ffmpeg conversion, tagging, instance lock
+watch_input.py   "Process file + link" pipeline
+watcher.py       URL to MP3 pipeline and queue watcher
+test_core.py     smoke tests for core.py
+config.json      folder settings
+Sound Merge.spec PyInstaller spec
+```
+
+## Disclaimer
+
+Not affiliated with SoundCloud, Beatport, Pioneer DJ / AlphaTheta or Rekordbox. Only download and convert music you have the right to use, and follow the terms of the services you use.
